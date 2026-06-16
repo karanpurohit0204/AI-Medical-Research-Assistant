@@ -3,7 +3,6 @@ Phase 4 — TTS Service
 Uses gTTS (fully free, no API key) with ElevenLabs (SDK v2.x) as optional upgrade.
 """
 
-import os
 import time
 from pathlib import Path
 from backend.core.config import get_settings
@@ -47,10 +46,12 @@ class TTSService:
         output_path = str(self.output_dir / f"answer_{timestamp}.mp3")
 
         client = ElevenLabs(api_key=self.settings.elevenlabs_api_key)
-        audio = client.generate(
+        voice_id = self.settings.elevenlabs_voice_id or "21m3hNDoDP8UNvVxNbwu"
+        audio = client.text_to_speech.convert(
+            voice_id=voice_id,
             text=text,
-            voice=self.settings.elevenlabs_voice_id or "Rachel",
-            model="eleven_monolingual_v1",
+            model_id="eleven_turbo_v2",
+            output_format="mp3_44100_128",
         )
         with open(output_path, "wb") as f:
             for chunk in audio:

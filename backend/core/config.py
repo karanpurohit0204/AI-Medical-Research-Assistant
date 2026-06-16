@@ -13,8 +13,6 @@ ncbi_api_key = os.getenv("NCBI_API_KEY")
 ncbi_email = os.getenv("NCBI_EMAIL")
 langchain_api_key = os.getenv("LANGCHAIN_API_KEY")
 
-print(mistral_api_key)
-
 class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
