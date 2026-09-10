@@ -1,0 +1,1 @@
+export function Status({ loading, error }: { loading?: boolean; error?: string | null }) { if (loading) return <div className="status loading" role="status"><i /> Finding current evidence…</div>; if (error) return <div className="status error" role="alert">{error}</div>; return null }

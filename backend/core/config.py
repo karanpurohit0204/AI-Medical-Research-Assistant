@@ -1,9 +1,14 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # Load .env file into environment variables
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+ENV_PATH = PROJECT_ROOT / ".env"
+
+load_dotenv(dotenv_path=ENV_PATH)
 
 groq_api_key = os.getenv("GROQ_API_KEY")
 mistral_api_key = os.getenv("MISTRAL_API_KEY")
@@ -16,7 +21,7 @@ langchain_api_key = os.getenv("LANGCHAIN_API_KEY")
 class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -35,27 +40,27 @@ class Settings(BaseSettings):
     # deepgram_api_key: str = ""
 
     # Groq LLM
-    groq_api_key: str = groq_api_key
-    groq_model: str = "llama3-8b-8192"
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
 
     # Mistral LLM
-    mistral_api_key: str = mistral_api_key
+    mistral_api_key: str = ""
     mistral_model: str = "mistral-small-latest"
 
     # ElevenLabs TTS
-    elevenlabs_api_key: str = elevenlabs_api_key
-    elevenlabs_voice_id: str = elevenlabs_voice_id
+    elevenlabs_api_key: str = ""
+    elevenlabs_voice_id: str = ""
 
     # PubMed
-    ncbi_api_key: str = ncbi_api_key
-    ncbi_email: str = ncbi_email
+    ncbi_api_key: str = ""
+    ncbi_email: str = ""
 
     # ChromaDB
     chroma_persist_dir: str = "./data/chroma"
     chroma_collection: str = "medical_papers"
 
     # LangSmith
-    langchain_api_key: str = langchain_api_key
+    langchain_api_key: str = ""
     langchain_tracing_v2: bool = False
     langchain_project: str = "medical-rag"
 
