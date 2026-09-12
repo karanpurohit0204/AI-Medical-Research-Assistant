@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import AliasChoices, Field
 from functools import lru_cache
 from dotenv import load_dotenv
 import os
@@ -30,7 +31,9 @@ class Settings(BaseSettings):
     # App
     app_name: str = "Medical RAG Assistant"
     app_env: str = "development"
-    debug: bool = True
+    # Avoid the generic DEBUG variable, which is commonly set by host tooling
+    # to non-boolean values such as "release".
+    debug: bool = Field(default=True, validation_alias=AliasChoices("APP_DEBUG"))
     port: int = 8000
 
     # Whisper STT
@@ -41,7 +44,7 @@ class Settings(BaseSettings):
 
     # Groq LLM
     groq_api_key: str = ""
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-120b"
 
     # Mistral LLM
     mistral_api_key: str = ""
