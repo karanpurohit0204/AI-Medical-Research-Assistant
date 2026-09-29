@@ -6,7 +6,6 @@ Start with: uvicorn backend.main:app --reload --port 8000
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from backend.core.config import get_settings
 from backend.core.logging import logger, setup_logging

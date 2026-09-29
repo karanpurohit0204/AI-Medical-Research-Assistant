@@ -4,9 +4,15 @@ Fetches real medical research papers from NCBI/PubMed using Biopython.
 No paid API needed. Free key at ncbi.nlm.nih.gov/account (optional but raises rate limit).
 """
 
-from typing import List
 from dataclasses import dataclass, field
+from functools import partial
+import ssl
+from typing import List
+from urllib.request import urlopen
+
 from Bio import Entrez
+import truststore
+
 from backend.core.config import get_settings
 from backend.core.logging import logger
 
@@ -50,6 +56,10 @@ class PubMedService:
 
     def __init__(self):
         settings = get_settings()
+        Entrez.urlopen = partial(
+            urlopen,
+            context=truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT),
+        )
         # Tell NCBI who is making requests (required by their terms of service)
         Entrez.email = settings.ncbi_email or "dev@example.com"
         if settings.ncbi_api_key:

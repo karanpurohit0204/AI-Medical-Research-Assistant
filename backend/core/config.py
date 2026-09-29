@@ -3,21 +3,9 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import AliasChoices, Field
 from functools import lru_cache
-from dotenv import load_dotenv
-import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH = PROJECT_ROOT / ".env"
-
-load_dotenv(dotenv_path=ENV_PATH)
-
-groq_api_key = os.getenv("GROQ_API_KEY")
-mistral_api_key = os.getenv("MISTRAL_API_KEY")
-elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY")
-elevenlabs_voice_id = os.getenv("ELEVENLABS_VOICE_ID")  # Default voice ID
-ncbi_api_key = os.getenv("NCBI_API_KEY")
-ncbi_email = os.getenv("NCBI_EMAIL")
-langchain_api_key = os.getenv("LANGCHAIN_API_KEY")
 
 class Settings(BaseSettings):
 
@@ -38,9 +26,6 @@ class Settings(BaseSettings):
 
     # Whisper STT
     whisper_model: str = "base"
-
-    # Deepgram (optional)
-    # deepgram_api_key: str = ""
 
     # Groq LLM
     groq_api_key: str = ""

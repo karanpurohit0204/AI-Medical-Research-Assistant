@@ -12,5 +12,5 @@ def test_groq_model_is_loaded_from_repo_env(tmp_path, monkeypatch):
     get_settings.cache_clear()
     settings = get_settings()
 
-    assert settings.groq_model == "llama-3.3-70b-versatile"
+    assert settings.groq_model == "openai/gpt-oss-120b"
     assert (project_root / ".env").exists()

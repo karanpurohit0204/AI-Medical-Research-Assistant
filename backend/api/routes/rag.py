@@ -7,7 +7,7 @@ GET  /api/rag/status   — shows how many papers are stored in ChromaDB
 import time
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 
 from backend.services.rag.rag_pipeline import RAGPipeline
 from backend.core.logging import logger

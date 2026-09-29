@@ -5,17 +5,47 @@ from typing import Optional
 
 import numpy as np
 import whisper
+import imageio_ffmpeg
 
 from backend.core.config import get_settings
 from backend.core.logging import logger
 
 
 _model: Optional[whisper.Whisper] = None
+_ffmpeg_configured = False
+
+
+def configure_ffmpeg() -> None:
+    """Expose imageio-ffmpeg's bundled binary to Whisper's decoder."""
+    global _ffmpeg_configured
+    if _ffmpeg_configured:
+        return
+
+    import whisper.audio
+
+    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+    ffmpeg_dir = str(Path(imageio_ffmpeg.get_ffmpeg_exe()).parent)
+    current_path = os.environ.get("PATH", "")
+    if ffmpeg_dir not in current_path.split(os.pathsep):
+        os.environ["PATH"] = f"{ffmpeg_dir}{os.pathsep}{current_path}"
+
+    # openai-whisper invokes the literal command `ffmpeg`, while imageio-ffmpeg
+    # ships a versioned executable filename. Route that invocation explicitly.
+    original_run = whisper.audio.run
+
+    def run_with_bundled_ffmpeg(command, *args, **kwargs):
+        if command and command[0] == "ffmpeg":
+            command = [ffmpeg_exe, *command[1:]]
+        return original_run(command, *args, **kwargs)
+
+    whisper.audio.run = run_with_bundled_ffmpeg
+    _ffmpeg_configured = True
 
 
 def load_whisper_model() -> whisper.Whisper:
     global _model
     if _model is None:
+        configure_ffmpeg()
         settings = get_settings()
         model_name = settings.whisper_model
         logger.info(f"Loading Whisper model: '{model_name}' ...")

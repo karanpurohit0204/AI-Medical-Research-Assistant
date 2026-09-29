@@ -9,7 +9,7 @@ Accepts text (post-STT) and returns a full medical answer with citations.
 import time
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List
 
 from backend.services.rag.rag_pipeline import RAGPipeline
 from backend.services.llm.llm_service import LLMService

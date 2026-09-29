@@ -6,28 +6,42 @@ them from a local ChromaDB collection.
 All free — no API key needed. Runs fully on your machine.
 """
 
-from typing import List
+from typing import TYPE_CHECKING, List
 from pathlib import Path
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from sentence_transformers import SentenceTransformer
 
 from backend.core.config import get_settings
 from backend.core.logging import logger
 from backend.services.rag.pubmed_service import PubMedPaper
 
 
-# Embedding model loaded once at module level
+if TYPE_CHECKING:
+    from sentence_transformers import SentenceTransformer
+
+
+# Embedding model loaded once, when a RAG request actually needs it.
 # all-MiniLM-L6-v2 = fast, small (80MB), good quality, free
-_embedder: SentenceTransformer | None = None
+_embedder: "SentenceTransformer | None" = None
 
 
-def get_embedder() -> SentenceTransformer:
+def get_embedder() -> "SentenceTransformer":
     global _embedder
     if _embedder is None:
         logger.info("Loading embedding model: all-MiniLM-L6-v2 ...")
-        _embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        try:
+            # This import loads native scientific packages.  Keeping it here
+            # prevents a local ML-runtime problem from stopping FastAPI (and
+            # unrelated endpoints such as /health and /api/stt/models).
+            from sentence_transformers import SentenceTransformer
+
+            _embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        except (ImportError, OSError) as exc:
+            raise RuntimeError(
+                "The RAG embedding runtime could not be loaded. Reinstall the "
+                "backend dependencies in a supported Python environment."
+            ) from exc
         logger.info("Embedding model ready.")
     return _embedder
 
@@ -177,4 +191,3 @@ class ChromaService:
             metadata={"hnsw:space": "cosine"},
         )
         logger.warning("ChromaDB collection cleared.")
-        
